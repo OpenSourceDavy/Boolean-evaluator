@@ -2,7 +2,8 @@
 #include <string>
 #include <vector>
 #include <algorithm>
-#include<string.h>
+#include <map>
+#include <unordered_map>
 
 using namespace std;
 
@@ -17,6 +18,7 @@ struct tokRslt {
     vector<string> syms;
     vector<string> vars;
     string msg;
+    unordered_map<string,string> varmap;
 };
 
 struct Input {
@@ -76,22 +78,7 @@ pNODE cons(string s, pNODE c1, pNODE c2) {
     ret->children[1] = c2;
     return ret;
 }
-//void Tokenize1(const string& str, vector<string>& tokens, const string& delimiters)
-//{
-//
-//    string::size_type lastPos = str.find_first_not_of(delimiters, 0);
-//
-//    string::size_type pos     = str.find_first_of(delimiters, lastPos);
-//    while (string::npos != pos || string::npos != lastPos)
-//    {
-//
-//        tokens.push_back(str.substr(lastPos, pos - lastPos));
-//
-//        lastPos = str.find_first_not_of(delimiters, pos);
-//
-//        pos = str.find_first_of(delimiters, lastPos);
-//    }
-//}
+
 
 auto split(const string& str, const string& delim)
 {
@@ -132,7 +119,7 @@ tokRslt tokenizevar(string s)
     tokRslt tokenize;
     tokenize.success = true;
 
-
+    unordered_map<string,string> varmap;
     if (tokenize.success)
     {
         tokenize.success = true;
@@ -177,6 +164,29 @@ tokRslt tokenizevar(string s)
                     tokenize.success = false;
                     break;
                 }
+                int z = j+1;
+                while(s[z]==' '){
+                    z +=1;
+                }
+                auto iterator = tokenize.varmap.find(s.substr(position, lenth));
+                if(iterator != tokenize.varmap.end()) {
+                    if ("0"==iterator->second){
+
+                        if (s[z]=='1'){
+                            tokenize.success = false;
+                            tokenize.msg ="contra";
+                            break;
+                        }
+                    }
+                    if ("1"==iterator->second){
+                        if (s[z]=='0'){
+                            tokenize.success = false;
+                            tokenize.msg ="contra";
+                            break;
+                        }
+                    }
+                }
+                tokenize.varmap[s.substr(position, lenth)] = s[z];
             }
 
 
@@ -199,53 +209,18 @@ tokRslt tokenizevar(string s)
 tokRslt checkvars(tokRslt t,string s){
     tokRslt re;
     if(!t.success){
+        if (t.msg== "contra"){
+            re.success = false;
+            re.msg ="Error: contradicting assignment";
+            return re;
+        }
         re.success = false;
         re.msg = "Error: invalid input";
         return re;
     }
-
-    if(!t.vars.empty()){
-
-        for (auto & var : t.vars){
-            auto vs {split(s, var)};
-            if (vs.size()>2) {
-                string value;
-                string value2;
-                for (char q : vs[1]) {
-
-                    if (q == ' ' || q == ':') {
-                        continue;
-                    } else if (q == '1' || q == '0') {
-
-
-                        value = q;
-                        break;
-                    }
-                }
-                for (char q : vs[2]) {
-
-                    if (q == ' ' || q == ':') {
-                        continue;
-                    } else if (q == '1' || q == '0') {
-
-                        value2 = q;
-                        break;
-                    }
-                }
-                if (value != value2) {
-                    re.success = false;
-                    re.msg = "Error: contradicting assignment";
-
-                    return re;
-                }
-            }
-        }
-        re.success = true;
-        re.msg = "success";
-        return re;
-    };
     re.success = true;
-    return re;
+    re.varmap = t.varmap;
+
 }
 
 
@@ -265,19 +240,28 @@ tokRslt tokenize(string s)
 
             if (s[i] == ' ')
                 continue;
-//            if (s[i] =='(' ||s[i] ==')'||s[i] =='1'||s[i] =='0'){
-//                if (s[i+1] !='+' &&s[i+1] !='-'&&s[i+1] !='*'){
-//                    tokenize.success = false;
-//                }
-//            }
+
             if (s[i] == '!'|| s[i] == '/'|| s[i] == '%'|| s[i] == '^'|| s[i] == '&'|| s[i] == '#'|| s[i] == '@'|| s[i] == '|'|| s[i] == '{'|| s[i] == '}'|| s[i] == '['|| s[i] == ']'|| s[i] == '?'|| s[i] == '='|| s[i] == '~'|| s[i] == '`'|| s[i] == '.'|| s[i+1] == '_'|| s[i+1] == '"'|| s[i+1] == ','|| s[i+1] == '<'|| s[i+1] == '>') {
                 tokenize.success = false;
                 break;
             }
-
+            if (s[i]=='-'){
+                int j = i+1;
+                while(s[j]==' '){
+                    j += 1;
+                }
+                if (!s[j]){
+                    tokenize.success = false;
+                    break;
+                }
+            }
             if (s[i] != '1' && s[i] != '0' && s[i] != '*' && s[i] != '+' && s[i] != '-'&&
                 s[i] != '(' && s[i] != ')' && s[i] != ' ')
             {
+                if (s[i]=='2'||s[i]=='3'||s[i]=='4'||s[i]=='5'||s[i]=='6'||s[i]=='7'||s[i]=='8'||s[i]=='9'){
+                    tokenize.success = false;
+                    break;
+                }
                 int lenth = 1;
                 int position = i;
 
@@ -347,63 +331,10 @@ tokRslt getvar(tokRslt t, string s, string msg, tokRslt varre){
             }
 
             else {
-
-                 auto vs {split(s, t.vars[i])};
-
-            if(vs.size()==1){
-                vs.push_back(" ");
-                swap(vs[1],vs[0]);
-            }
-
-
-                if (vs.size()>2) {
-                    string value;
-                    string value2;
-                    for (char q : vs[1]) {
-
-                        if (q == ' ' || q == ':') {
-                            continue;
-                        } else if (q == '1' || q == '0') {
-
-
-                            value = q;
-                            break;
-                        }
-                    }
-                    for (char q : vs[2]) {
-
-                        if (q == ' ' || q == ':') {
-                            continue;
-                        } else if (q == '1' || q == '0') {
-
-                            value2 = q;
-                            break;
-                        }
-                    }
-                    if (value != value2) {
-                        t.success = false;
-                        t.msg = "Error: contradicting assignment";
-
-                        return t;
-                    }
+                auto iterator = varre.varmap.find(t.vars[i]);
+                if(iterator != varre.varmap.end()) {
+                    t.vars[i] = iterator->second;
                 }
-                idx = vs[1].find(":");
-                if (idx == string::npos) {
-                    t.success = false;
-                    t.msg = "Error: invalid input";
-                    return t;
-                }
-                for (size_t q = 0; q < vs[1].size(); q++) {
-
-                    if (vs[1][q] == ' ' || vs[1][q] == ':') {
-                        continue;
-                    } else if (vs[1][q] == '1' || vs[1][q] == '0') {
-
-                        t.vars[i] = vs[1][q];
-                        break;
-                    }
-                }
-
             }
         }
 
