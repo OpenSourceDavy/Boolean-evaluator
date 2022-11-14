@@ -407,8 +407,28 @@ parseRslt parse(vector<string> V)
         expression.ast = *cons("EMPTY", NULL, NULL);
         return expression;
     }
+    for (size_t i = 0; i < V.size() - 1; i++)
+    {
+        if (V[i] == "-")
+        {
+            if (V[i + 1] == "1" ){
+                V[i + 1] = "0";
+                auto iter = V.erase(V.begin() + i);
 
+            }
+        }
+        if (V[i] == "-")
+        {
+            if (V[i + 1] == "0" ){
+                V[i + 1] = "1";
+                auto iter = V.erase(V.begin() + i);
 
+            }
+        }
+    }
+//    for (auto j: V){
+//        cout<<j;
+//    }
     expression2 = checkBooleanExpression(V, 0, V.size());
 
     if (expression2 == NULL)
@@ -421,7 +441,7 @@ parseRslt parse(vector<string> V)
 
     if (expression.success)
     {
-//        prinTree(expression.ast);
+//  prinTree(expression.ast);
         return expression;
     }
     else
@@ -469,21 +489,22 @@ pNODE checkUnbreakable(vector<string> V, int start, int stop)
 
 pNODE checkNegation(vector<string> V, int start, int stop)
 {
-    pNODE expression;
+    pNODE expression1;
 
     for (int i = start; i < stop; i++)
     {
         if (V[i] == "-")
         {
-            expression = checkNegation(V, start + 1, stop);
-            if (expression != NULL)
-                return cons(V[i], expression, NULL);
+
+            expression1 = checkNegation(V, start + 1, stop);
+            if (expression1 != NULL)
+                return cons(V[i], expression1, NULL);
         }
     }
 
-    expression = checkUnbreakable(V, start, stop);
-    if (expression != NULL)
-        return expression;
+    expression1 = checkUnbreakable(V, start, stop);
+    if (expression1 != NULL)
+        return expression1;
     else
         return NULL;
 }
