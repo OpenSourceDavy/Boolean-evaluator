@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <map>
 #include <unordered_map>
+#include <regex>
 
 using namespace std;
 
@@ -258,8 +259,13 @@ tokRslt tokenize(string s)
             if (s[i] != '1' && s[i] != '0' && s[i] != '*' && s[i] != '+' && s[i] != '-'&&
                 s[i] != '(' && s[i] != ')' && s[i] != ' ')
             {
-                if (s[i]=='2'||s[i]=='3'||s[i]=='4'||s[i]=='5'||s[i]=='6'||s[i]=='7'||s[i]=='8'||s[i]=='9'){
+                regex varreg("[A-Za-z]");
+                string c ;
+                c.append(1,s[i]);
+                bool match = regex_match(c,varreg);
+                if (!match){
                     tokenize.success = false;
+
                     break;
                 }
                 int lenth = 1;
@@ -267,8 +273,10 @@ tokRslt tokenize(string s)
 
                 while(s[i+1] && s[i+1] != '*' && s[i+1] != '+' && s[i+1] != '-'&&
                       s[i+1] != '(' && s[i+1] != ')' && s[i+1] != ' ') {
-                    if (s[i+1] == '!'|| s[i+1] == '/'|| s[i+1] == '%'|| s[i+1] == '^'|| s[i+1] == '&'|| s[i+1] == '#'|| s[i+1] == '@'|| s[i+1] == '|'|| s[i+1] == '{'|| s[i+1] == '}'|| s[i+1] == '['|| s[i+1] == ']'|| s[i+1] == '?'|| s[i+1] == '='|| s[i+1] == '~'|| s[i+1] == '`'|| s[i+1] == '.'|| s[i+1] == '_'|| s[i+1] == '"'|| s[i+1] == ','|| s[i+1] == '<'|| s[i+1] == '>') {
-
+                    string c1 ;
+                    c1.append(1,s[i+1]);
+                    bool nummatch = regex_match(c1,varreg);
+                    if (!nummatch){
                         tokenize.success = false;
                         break;
                     }
@@ -407,28 +415,7 @@ parseRslt parse(vector<string> V)
         expression.ast = *cons("EMPTY", NULL, NULL);
         return expression;
     }
-    for (size_t i = 0; i < V.size() - 1; i++)
-    {
-        if (V[i] == "-")
-        {
-            if (V[i + 1] == "1" ){
-                V[i + 1] = "0";
-                auto iter = V.erase(V.begin() + i);
 
-            }
-        }
-        if (V[i] == "-")
-        {
-            if (V[i + 1] == "0" ){
-                V[i + 1] = "1";
-                auto iter = V.erase(V.begin() + i);
-
-            }
-        }
-    }
-//    for (auto j: V){
-//        cout<<j;
-//    }
     expression2 = checkBooleanExpression(V, 0, V.size());
 
     if (expression2 == NULL)
@@ -496,7 +483,7 @@ pNODE checkNegation(vector<string> V, int start, int stop)
         if (V[i] == "-")
         {
 
-            expression1 = checkNegation(V, start + 1, stop);
+            expression1 = checkNegation(V, i + 1, stop);
             if (expression1 != NULL)
                 return cons(V[i], expression1, NULL);
         }
