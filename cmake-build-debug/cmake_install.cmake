@@ -1,4 +1,4 @@
-# Install script for directory: C:/Users/davy3/CLionProjects/ECE650
+# Install script for directory: C:/Users/davy3/Desktop/Boolean evaluator/Boolean-evaluator
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -45,5 +45,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "C:/Users/davy3/CLionProjects/ECE650/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "C:/Users/davy3/Desktop/Boolean evaluator/Boolean-evaluator/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

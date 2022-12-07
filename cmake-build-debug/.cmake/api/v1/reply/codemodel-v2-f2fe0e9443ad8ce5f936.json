@@ -49,8 +49,8 @@
 	"kind" : "codemodel",
 	"paths" : 
 	{
-		"build" : "C:/Users/davy3/CLionProjects/ECE650/cmake-build-debug",
-		"source" : "C:/Users/davy3/CLionProjects/ECE650"
+		"build" : "C:/Users/davy3/Desktop/Boolean evaluator/Boolean-evaluator/cmake-build-debug",
+		"source" : "C:/Users/davy3/Desktop/Boolean evaluator/Boolean-evaluator"
 	},
 	"version" : 
 	{

@@ -478,16 +478,15 @@ pNODE checkNegation(vector<string> V, int start, int stop)
 {
     pNODE expression1;
 
-    for (int i = start; i < stop; i++)
-    {
-        if (V[i] == "-")
+
+        if (V[start] == "-")
         {
 
-            expression1 = checkNegation(V, i + 1, stop);
+            expression1 = checkNegation(V, start + 1, stop);
             if (expression1 != NULL)
-                return cons(V[i], expression1, NULL);
+                return cons(V[start], expression1, NULL);
         }
-    }
+
 
     expression1 = checkUnbreakable(V, start, stop);
     if (expression1 != NULL)
